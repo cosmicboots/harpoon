@@ -97,6 +97,11 @@ function Harpoon:_for_each_list(cb)
     end
 end
 
+---Resets harpoon data by reading from disk
+function Harpoon:reset()
+    self.data = Data.Data:new(self.config)
+end
+
 function Harpoon:sync()
     local key = self.config.settings.key()
     self:_for_each_list(function(list, _, list_name)
@@ -152,10 +157,13 @@ function Harpoon.setup(self, partial_config)
     ---TODO: should we go through every seen list and update its config?
 
     if self.hooks_setup == false then
-        vim.api.nvim_create_autocmd({ "BufLeave", "VimLeavePre" }, {
+        vim.api.nvim_create_autocmd({ "BufLeave", "VimLeavePre", "DirChanged" }, {
             group = HarpoonGroup,
             pattern = "*",
             callback = function(ev)
+                if ev.event == "DirChanged" then
+                    self:reset()
+                end
                 self:_for_each_list(function(list, config)
                     local fn = config[ev.event]
                     if fn ~= nil then
