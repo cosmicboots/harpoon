@@ -100,6 +100,7 @@ end
 ---Resets harpoon data by reading from disk
 function Harpoon:reset()
     self.data = Data.Data:new(self.config)
+    self.lists = {}
 end
 
 function Harpoon:sync()
